@@ -1,6 +1,8 @@
  /*
   * Cheerlights Ethernet, a program that connects directly to the Cheerlights
   * API to turn a common-anode RGB LED to different colors
+
+  THIS IS NOT THE RIGHT CODE
   */
 
 #include <SPI.h>
