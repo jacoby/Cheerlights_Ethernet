@@ -13,6 +13,7 @@
  * Blue wire (blue color) connecting A pin 3 to LED 4
  */
 
+#include <String.h>
 #include <SPI.h>
 #include <Ethernet.h>
 
@@ -26,44 +27,64 @@ char server[] = "api.thingspeak.com";
 EthernetClient client;
 
 int led = 0 ;
-int delay_length = 6000 ;
+int delay_length = 1000 ;
 
-// Cobble together these with ascii. 
-char blu[4] = {10, 98, 108, 117} ; 
-char cya[4] = {10, 99, 121, 97} ;
-char dar[4] = {10, 100, 97, 114} ;
-char gre[4] = {10, 103, 114, 101} ;
-char mag[4] = {10, 109, 97, 103} ; 
-char ora[4] = {10, 111, 114, 97} ; 
-char pur[4] = {10, 112, 117, 114} ; 
-char red[4] = {10, 114, 101, 100} ; 
-char war[4] = {10, 119, 97, 114} ; 
-char whi[4] = {10, 119, 104, 115} ; 
-char yel[4] = {10, 121, 101, 108} ; 
+// Cobble together these with ascii.
+char blu[5] = {10, 98, 108, 117 , 0} ;
+char cya[5] = {10, 99, 121, 97 , 0} ;
+char dar[5] = {10, 100, 97, 114 , 0} ;
+char gre[5] = {10, 103, 114, 101 , 0} ;
+char mag[5] = {10, 109, 97, 103 , 0} ;
+char ora[5] = {10, 111, 114, 97 , 0} ;
+char pur[5] = {10, 112, 117, 114 , 0} ;
+char red[5] = {10, 114, 101, 100 , 0} ;
+char war[5] = {10, 119, 97, 114 , 0} ;
+char whi[5] = {10, 119, 104, 115 , 0} ;
+char yel[5] = {10, 121, 101, 108 , 0} ;
 
-// ======================================================================
+String blue = blu ;
+String cyan = cya ;
+String dark = dar ;
+String green = gre ;
+String magenta = mag ;
+String orange = ora ;
+String purple = pur ;
+String redd = red ;
+String warmwhite = war ;
+String white = whi ;
+String yellow = yel ;
+
+//String dark = dar ;
+//char crlf[4] = { 13 , 10 , 13 , 10 } ;
+
+//String newString = oldString;
+// ================================================================================
 void setup() {
   Serial.begin(9600);
   delay(100) ;
+  Serial.println( "Starting" ) ;
+  c_white() ;
 
   // start the Ethernet connection:
   if (Ethernet.begin(mac) == 0) {
     Serial.println("Failed to configure Ethernet using DHCP");
     Ethernet.begin(mac, ip);
+    c_red() ;
   }
 
   // give the Ethernet shield a second to initialize:
   Serial.println("connecting...");
 }
 
-// ======================================================================
+// ================================================================================
 void loop() {
   get_lights( server ) ;
   delay( delay_length ) ;
 }
 
-// ======================================================================
+// ================================================================================
 void get_lights( char server[] ) {
+
   Serial.print( server ) ;
   Serial.println( " ------------------------------" ) ;
   if (client.connect(server, 80)) {
@@ -76,81 +97,58 @@ void get_lights( char server[] ) {
     delay( 500 ) ; // delay to make sure client is available
 
     if (client.available()) {
-      char matchbuf[4] ;
+      char matchbuf[5] ;
       char newline[] = {13, 10} ;
       while (client.available() > 0) {
         matchbuf[0] = matchbuf[1];
         matchbuf[1] = matchbuf[2];
         matchbuf[2] = matchbuf[3];
         matchbuf[3] = client.read();
+        matchbuf[4] = 0 ;
+        String matchstr = matchbuf ;
 
-        if ( strcmp(blu, matchbuf) == 10 ) {
-          Serial.println( "Blue" ) ;
-          Serial.println( matchbuf ) ;
-          Serial.println( strcmp(blu, matchbuf) ) ;
-          Serial.println( blu ) ;
+        if ( matchstr.equals( blue ) ) {
+          Serial.println( "BLUE" ) ;
           c_blue() ;
         }
-        else if ( strcmp(cya, matchbuf) == 10 ) {
-          Serial.println( "Cyan" ) ;
-          Serial.println( matchbuf ) ;
-          Serial.println( strcmp(blu, matchbuf) ) ;
-          Serial.println( cya ) ;
+        if ( matchstr.equals( cyan ) ) {
+          Serial.println( "CYAN" ) ;
           c_cyan() ;
         }
-        else if ( strcmp(dar, matchbuf) == 10 ) {
-          Serial.println( "Dark" ) ;
+        if ( matchstr.equals( dark ) ) {
+          Serial.println( "DARK" ) ;
           c_dark() ;
         }
-        else if ( strcmp(gre, matchbuf) == 10 ) {
-          Serial.println( "Green" ) ;
-          Serial.println( matchbuf ) ;
-          Serial.println( strcmp(blu, matchbuf) ) ;
-          Serial.println( gre ) ;
+        if ( matchstr.equals( green ) ) {
+          Serial.println( "GREEN" ) ;
           c_green() ;
         }
-        else if ( strcmp(mag, matchbuf) == 10 ) {
-          Serial.println( "Magenta" ) ;
+        if ( matchstr.equals( magenta ) ) {
+          Serial.println( "MAGENTA" ) ;
           c_magenta() ;
-          Serial.println( matchbuf ) ;
-          Serial.println( strcmp(blu, matchbuf) ) ;
-          Serial.println( mag ) ;
         }
-        else if ( strcmp(ora, matchbuf) == 10 ) {
-          Serial.println( "Orange" ) ;
-          c_orange() ;
-        }
-        else if ( strcmp(pur, matchbuf) == 10 ) {
-          Serial.println( "Purple" ) ;
+        if ( matchstr.equals( purple ) ) {
+          Serial.println( "PURPLE" ) ;
           c_purple() ;
         }
-        else if ( strcmp(red, matchbuf) == 10 ) {
+        if ( matchstr.equals( redd ) ) {
           Serial.println( "Red" ) ;
           c_red() ;
         }
-        else if ( strcmp(war, matchbuf) == 10 ) {
-          Serial.println( "Warmwhite" ) ;
-          Serial.println( matchbuf ) ;
-          Serial.println( strcmp(war, matchbuf) ) ;
-          Serial.println( war ) ;
+        if ( matchstr.equals( warmwhite ) ) {
+          Serial.println( "WARM WHITE" ) ;
           c_warmwhite() ;
         }
-        else if ( strcmp(whi, matchbuf) == 10 ) {
-          Serial.println( "White" ) ;
-          Serial.println( matchbuf ) ;
-          Serial.println( strcmp(blu, matchbuf) ) ;
-          Serial.println( whi ) ;
+        if ( matchstr.equals( white ) ) {
+          Serial.println( "WHITE" ) ;
           c_white() ;
         }
-        else if ( strcmp(yel, matchbuf) == 10 ) {
-          Serial.println( "Yellow" ) ;
-          Serial.println( matchbuf ) ;
-          Serial.println( strcmp(yel, matchbuf) ) ;
-          Serial.println( yel ) ;
+        if ( matchstr.equals( yellow ) ) {
+          Serial.println( "YELLOW" ) ;
           c_yellow() ;
         }
       }
-    Serial.println( "--------------------" ) ;
+      Serial.println( "--------------------" ) ;
     }
     else {
       Serial.println();
@@ -163,7 +161,7 @@ void get_lights( char server[] ) {
   client.stop() ;
 }
 
-// ======================================================================
+// ================================================================================
 void setColourRgb(unsigned int red, unsigned int green, unsigned int blue) {
   Serial.print( "\t" ) ;
   Serial.print( red ) ;
@@ -176,57 +174,57 @@ void setColourRgb(unsigned int red, unsigned int green, unsigned int blue) {
   analogWrite( bluePin  , blue  ) ;
 }
 
-// ======================================================================
+// ================================================================================
 void c_red()       {
   setColourRgb(   0, 255, 255 ) ;
 }
 
-// ======================================================================
+// ================================================================================
 void c_green()     {
   setColourRgb( 255,   0, 255 ) ;
 }
 
-// ======================================================================
+// ================================================================================
 void c_blue()      {
   setColourRgb( 255, 255,   0 ) ;
 }
 
-// ======================================================================
+// ================================================================================
 void c_cyan()      {
   setColourRgb( 255,   0,   0 ) ;
 }
 
-// ======================================================================
+// ================================================================================
 void c_white()     {
   setColourRgb(   0,   0,   0 ) ;
 }
 
-// ======================================================================
+// ================================================================================
 void c_warmwhite() {
   setColourRgb(   0,  32,  32 ) ;
 }
 
-// ======================================================================
+// ================================================================================
 void c_purple()    {
   setColourRgb( 128, 255, 128 ) ;
 }
 
-// ======================================================================
+// ================================================================================
 void c_magenta()   {
   setColourRgb(   0, 255,   0 ) ;
 }
 
-// ======================================================================
+// ================================================================================
 void c_yellow()    {
   setColourRgb(   0,   0, 255 ) ;
 }
 
-// ======================================================================
+// ================================================================================
 void c_orange()    {
   setColourRgb(   0, 165, 255 ) ;
 }
 
-// ======================================================================
+// ================================================================================
 void c_dark()      {
   setColourRgb( 255, 255, 255 ) ;
 }
